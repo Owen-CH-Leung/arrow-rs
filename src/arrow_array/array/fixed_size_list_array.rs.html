@@ -938,7 +938,7 @@
     <span class="doccomment">/// Returns ith value of this list array.
     </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; ArrayRef {
         <span class="self">self</span>.values
-            .slice(<span class="self">self</span>.value_offset(i) <span class="kw">as </span>usize, <span class="self">self</span>.value_length() <span class="kw">as </span>usize)
+            .slice(<span class="self">self</span>.value_offset_at(i), <span class="self">self</span>.value_length() <span class="kw">as </span>usize)
     }
 
     <span class="doccomment">/// Returns the offset for value at index `i`.
@@ -946,7 +946,7 @@
     /// Note this doesn't do any bound checking, for performance reason.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>value_offset(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; i32 {
-        <span class="self">self</span>.value_offset_at(i)
+        <span class="self">self</span>.value_offset_at(i) <span class="kw">as </span>i32
     }
 
     <span class="doccomment">/// Returns the length for an element.
@@ -958,8 +958,8 @@
     }
 
     <span class="attr">#[inline]
-    </span><span class="kw">const fn </span>value_offset_at(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; i32 {
-        i <span class="kw">as </span>i32 * <span class="self">self</span>.value_length
+    </span><span class="kw">const fn </span>value_offset_at(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; usize {
+        i * <span class="self">self</span>.value_length <span class="kw">as </span>usize
     }
 
     <span class="doccomment">/// Returns a zero-copy slice of this array with the indicated offset and length.
