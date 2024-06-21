@@ -491,7 +491,7 @@
     arrow::arrow_writer::ArrowWriterOptions,
     arrow::ArrowWriter,
     errors::{ParquetError, <span class="prelude-ty">Result</span>},
-    file::{metadata::RowGroupMetaData, properties::WriterProperties},
+    file::{metadata::RowGroupMetaDataPtr, properties::WriterProperties},
     format::{FileMetaData, KeyValue},
 };
 <span class="kw">use </span>arrow_array::RecordBatch;
@@ -609,7 +609,7 @@
     }
 
     <span class="doccomment">/// Returns metadata for any flushed row groups
-    </span><span class="kw">pub fn </span>flushed_row_groups(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RowGroupMetaData] {
+    </span><span class="kw">pub fn </span>flushed_row_groups(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RowGroupMetaDataPtr] {
         <span class="self">self</span>.sync_writer.flushed_row_groups()
     }
 
