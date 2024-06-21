@@ -3140,6 +3140,28 @@
 <a href="#3140" id="3140">3140</a>
 <a href="#3141" id="3141">3141</a>
 <a href="#3142" id="3142">3142</a>
+<a href="#3143" id="3143">3143</a>
+<a href="#3144" id="3144">3144</a>
+<a href="#3145" id="3145">3145</a>
+<a href="#3146" id="3146">3146</a>
+<a href="#3147" id="3147">3147</a>
+<a href="#3148" id="3148">3148</a>
+<a href="#3149" id="3149">3149</a>
+<a href="#3150" id="3150">3150</a>
+<a href="#3151" id="3151">3151</a>
+<a href="#3152" id="3152">3152</a>
+<a href="#3153" id="3153">3153</a>
+<a href="#3154" id="3154">3154</a>
+<a href="#3155" id="3155">3155</a>
+<a href="#3156" id="3156">3156</a>
+<a href="#3157" id="3157">3157</a>
+<a href="#3158" id="3158">3158</a>
+<a href="#3159" id="3159">3159</a>
+<a href="#3160" id="3160">3160</a>
+<a href="#3161" id="3161">3161</a>
+<a href="#3162" id="3162">3162</a>
+<a href="#3163" id="3163">3163</a>
+<a href="#3164" id="3164">3164</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3185,7 +3207,7 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::data_type::{ByteArray, FixedLenByteArray};
 <span class="kw">use </span><span class="kw">crate</span>::errors::{ParquetError, <span class="prelude-ty">Result</span>};
-<span class="kw">use </span><span class="kw">crate</span>::file::metadata::{ColumnChunkMetaData, KeyValue, RowGroupMetaDataPtr};
+<span class="kw">use </span><span class="kw">crate</span>::file::metadata::{ColumnChunkMetaData, KeyValue, RowGroupMetaData};
 <span class="kw">use </span><span class="kw">crate</span>::file::properties::{WriterProperties, WriterPropertiesPtr};
 <span class="kw">use </span><span class="kw">crate</span>::file::reader::{ChunkReader, Length};
 <span class="kw">use </span><span class="kw">crate</span>::file::writer::{SerializedFileWriter, SerializedRowGroupWriter};
@@ -3341,7 +3363,7 @@
     }
 
     <span class="doccomment">/// Returns metadata for any flushed row groups
-    </span><span class="kw">pub fn </span>flushed_row_groups(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RowGroupMetaDataPtr] {
+    </span><span class="kw">pub fn </span>flushed_row_groups(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RowGroupMetaData] {
         <span class="self">self</span>.writer.flushed_row_groups()
     }
 
@@ -4195,7 +4217,9 @@
     <span class="kw">use </span><span class="kw">crate</span>::file::metadata::ParquetMetaData;
     <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index::Index;
     <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index_reader::read_pages_locations;
-    <span class="kw">use </span><span class="kw">crate</span>::file::properties::{EnabledStatistics, ReaderProperties, WriterVersion};
+    <span class="kw">use </span><span class="kw">crate</span>::file::properties::{
+        BloomFilterPosition, EnabledStatistics, ReaderProperties, WriterVersion,
+    };
     <span class="kw">use </span><span class="kw">crate</span>::file::serialized_reader::ReadOptionsBuilder;
     <span class="kw">use </span><span class="kw">crate</span>::file::{
         reader::{FileReader, SerializedFileReader},
@@ -4843,6 +4867,7 @@
         values: ArrayRef,
         schema: SchemaRef,
         bloom_filter: bool,
+        bloom_filter_position: BloomFilterPosition,
     }
 
     <span class="kw">impl </span>RoundTripOptions {
@@ -4853,6 +4878,7 @@
                 values,
                 schema: Arc::new(schema),
                 bloom_filter: <span class="bool-val">false</span>,
+                bloom_filter_position: BloomFilterPosition::AfterRowGroup,
             }
         }
     }
@@ -4872,6 +4898,7 @@
             values,
             schema,
             bloom_filter,
+            bloom_filter_position,
         } = options;
 
         <span class="kw">let </span>encodings = <span class="kw">match </span>values.data_type() {
@@ -4912,6 +4939,7 @@
                             .set_dictionary_page_size_limit(dictionary_size.max(<span class="number">1</span>))
                             .set_encoding(<span class="kw-2">*</span>encoding)
                             .set_bloom_filter_enabled(bloom_filter)
+                            .set_bloom_filter_position(bloom_filter_position)
                             .build();
 
                         files.push(roundtrip_opts(<span class="kw-2">&amp;</span>expected_batch, props))
@@ -5267,6 +5295,22 @@
 
         <span class="comment">// BinaryArrays can't be built from Vec&lt;Option&lt;&amp;str&gt;&gt;, so only call `values_required`
         </span>values_required::&lt;BinaryViewArray, <span class="kw">_</span>&gt;(many_vecs_iter);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>i32_column_bloom_filter_at_end() {
+        <span class="kw">let </span>array = Arc::new(Int32Array::from_iter(<span class="number">0</span>..SMALL_SIZE <span class="kw">as </span>i32));
+        <span class="kw">let </span><span class="kw-2">mut </span>options = RoundTripOptions::new(array, <span class="bool-val">false</span>);
+        options.bloom_filter = <span class="bool-val">true</span>;
+        options.bloom_filter_position = BloomFilterPosition::End;
+
+        <span class="kw">let </span>files = one_column_roundtrip_with_options(options);
+        check_bloom_filter(
+            files,
+            <span class="string">"col"</span>.to_string(),
+            (<span class="number">0</span>..SMALL_SIZE <span class="kw">as </span>i32).collect(),
+            (SMALL_SIZE <span class="kw">as </span>i32 + <span class="number">1</span>..SMALL_SIZE <span class="kw">as </span>i32 + <span class="number">10</span>).collect(),
+        );
     }
 
     <span class="attr">#[test]

@@ -1829,6 +1829,29 @@
 <a href="#1829" id="1829">1829</a>
 <a href="#1830" id="1830">1830</a>
 <a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
+<a href="#1833" id="1833">1833</a>
+<a href="#1834" id="1834">1834</a>
+<a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
+<a href="#1840" id="1840">1840</a>
+<a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
+<a href="#1843" id="1843">1843</a>
+<a href="#1844" id="1844">1844</a>
+<a href="#1845" id="1845">1845</a>
+<a href="#1846" id="1846">1846</a>
+<a href="#1847" id="1847">1847</a>
+<a href="#1848" id="1848">1848</a>
+<a href="#1849" id="1849">1849</a>
+<a href="#1850" id="1850">1850</a>
+<a href="#1851" id="1851">1851</a>
+<a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1865,8 +1888,9 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::data_type::DataType;
 <span class="kw">use </span><span class="kw">crate</span>::errors::{ParquetError, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::file::properties::{BloomFilterPosition, WriterPropertiesPtr};
 <span class="kw">use </span><span class="kw">crate</span>::file::reader::ChunkReader;
-<span class="kw">use </span><span class="kw">crate</span>::file::{metadata::<span class="kw-2">*</span>, properties::WriterPropertiesPtr, PARQUET_MAGIC};
+<span class="kw">use </span><span class="kw">crate</span>::file::{metadata::<span class="kw-2">*</span>, PARQUET_MAGIC};
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::{<span class="self">self</span>, ColumnDescPtr, SchemaDescPtr, SchemaDescriptor, TypePtr};
 
 <span class="doccomment">/// A wrapper around a [`Write`] that keeps track of the number
@@ -1946,9 +1970,10 @@
 /// - the row group metadata
 /// - the column index for each column chunk
 /// - the offset index for each column chunk
-</span><span class="kw">pub type </span>OnCloseRowGroup&lt;<span class="lifetime">'a</span>&gt; = Box&lt;
+</span><span class="kw">pub type </span>OnCloseRowGroup&lt;<span class="lifetime">'a</span>, W&gt; = Box&lt;
     <span class="kw">dyn </span>FnOnce(
-            RowGroupMetaDataPtr,
+            <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>TrackedWrite&lt;W&gt;,
+            RowGroupMetaData,
             Vec&lt;<span class="prelude-ty">Option</span>&lt;Sbbf&gt;&gt;,
             Vec&lt;<span class="prelude-ty">Option</span>&lt;ColumnIndex&gt;&gt;,
             Vec&lt;<span class="prelude-ty">Option</span>&lt;OffsetIndex&gt;&gt;,
@@ -1974,7 +1999,7 @@
     schema: TypePtr,
     descr: SchemaDescPtr,
     props: WriterPropertiesPtr,
-    row_groups: Vec&lt;RowGroupMetaDataPtr&gt;,
+    row_groups: Vec&lt;RowGroupMetaData&gt;,
     bloom_filters: Vec&lt;Vec&lt;<span class="prelude-ty">Option</span>&lt;Sbbf&gt;&gt;&gt;,
     column_indexes: Vec&lt;Vec&lt;<span class="prelude-ty">Option</span>&lt;ColumnIndex&gt;&gt;&gt;,
     offset_indexes: Vec&lt;Vec&lt;<span class="prelude-ty">Option</span>&lt;OffsetIndex&gt;&gt;&gt;,
@@ -2028,18 +2053,29 @@
 
         <span class="self">self</span>.row_group_index += <span class="number">1</span>;
 
+        <span class="kw">let </span>bloom_filter_position = <span class="self">self</span>.properties().bloom_filter_position();
         <span class="kw">let </span>row_groups = <span class="kw-2">&amp;mut </span><span class="self">self</span>.row_groups;
         <span class="kw">let </span>row_bloom_filters = <span class="kw-2">&amp;mut </span><span class="self">self</span>.bloom_filters;
         <span class="kw">let </span>row_column_indexes = <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_indexes;
         <span class="kw">let </span>row_offset_indexes = <span class="kw-2">&amp;mut </span><span class="self">self</span>.offset_indexes;
-        <span class="kw">let </span>on_close =
-            |metadata, row_group_bloom_filter, row_group_column_index, row_group_offset_index| {
-                row_groups.push(metadata);
-                row_bloom_filters.push(row_group_bloom_filter);
-                row_column_indexes.push(row_group_column_index);
-                row_offset_indexes.push(row_group_offset_index);
-                <span class="prelude-val">Ok</span>(())
+        <span class="kw">let </span>on_close = <span class="kw">move </span>|buf,
+                             <span class="kw-2">mut </span>metadata,
+                             row_group_bloom_filter,
+                             row_group_column_index,
+                             row_group_offset_index| {
+            row_bloom_filters.push(row_group_bloom_filter);
+            row_column_indexes.push(row_group_column_index);
+            row_offset_indexes.push(row_group_offset_index);
+            <span class="comment">// write bloom filters out immediately after the row group if requested
+            </span><span class="kw">match </span>bloom_filter_position {
+                BloomFilterPosition::AfterRowGroup =&gt; {
+                    write_bloom_filters(buf, row_bloom_filters, <span class="kw-2">&amp;mut </span>metadata)<span class="question-mark">?
+                </span>}
+                BloomFilterPosition::End =&gt; (),
             };
+            row_groups.push(metadata);
+            <span class="prelude-val">Ok</span>(())
+        };
 
         <span class="kw">let </span>row_group_writer = SerializedRowGroupWriter::new(
             <span class="self">self</span>.descr.clone(),
@@ -2052,7 +2088,7 @@
     }
 
     <span class="doccomment">/// Returns metadata for any flushed row groups
-    </span><span class="kw">pub fn </span>flushed_row_groups(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RowGroupMetaDataPtr] {
+    </span><span class="kw">pub fn </span>flushed_row_groups(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RowGroupMetaData] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.row_groups
     }
 
@@ -2104,34 +2140,6 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Serialize all the bloom filter to the file
-    </span><span class="kw">fn </span>write_bloom_filters(<span class="kw-2">&amp;mut </span><span class="self">self</span>, row_groups: <span class="kw-2">&amp;mut </span>[RowGroup]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-        <span class="comment">// iter row group
-        // iter each column
-        // write bloom filter to the file
-        </span><span class="kw">for </span>(row_group_idx, row_group) <span class="kw">in </span>row_groups.iter_mut().enumerate() {
-            <span class="kw">for </span>(column_idx, column_chunk) <span class="kw">in </span>row_group.columns.iter_mut().enumerate() {
-                <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.bloom_filters[row_group_idx][column_idx] {
-                    <span class="prelude-val">Some</span>(bloom_filter) =&gt; {
-                        <span class="kw">let </span>start_offset = <span class="self">self</span>.buf.bytes_written();
-                        bloom_filter.write(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buf)<span class="question-mark">?</span>;
-                        <span class="kw">let </span>end_offset = <span class="self">self</span>.buf.bytes_written();
-                        <span class="comment">// set offset and index for bloom filter
-                        </span><span class="kw">let </span>column_chunk_meta = column_chunk
-                            .meta_data
-                            .as_mut()
-                            .expect(<span class="string">"can't have bloom filter without column metadata"</span>);
-                        column_chunk_meta.bloom_filter_offset = <span class="prelude-val">Some</span>(start_offset <span class="kw">as </span>i64);
-                        column_chunk_meta.bloom_filter_length =
-                            <span class="prelude-val">Some</span>((end_offset - start_offset) <span class="kw">as </span>i32);
-                    }
-                    <span class="prelude-val">None </span>=&gt; {}
-                }
-            }
-        }
-        <span class="prelude-val">Ok</span>(())
-    }
-
     <span class="doccomment">/// Serialize all the column index to the file
     </span><span class="kw">fn </span>write_column_indexes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, row_groups: <span class="kw-2">&amp;mut </span>[RowGroup]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="comment">// iter row group
@@ -2162,6 +2170,11 @@
         <span class="self">self</span>.finished = <span class="bool-val">true</span>;
         <span class="kw">let </span>num_rows = <span class="self">self</span>.row_groups.iter().map(|x| x.num_rows()).sum();
 
+        <span class="comment">// write out any remaining bloom filters after all row groups
+        </span><span class="kw">for </span>row_group <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.row_groups {
+            write_bloom_filters(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buf, <span class="kw-2">&amp;mut </span><span class="self">self</span>.bloom_filters, row_group)<span class="question-mark">?</span>;
+        }
+
         <span class="kw">let </span><span class="kw-2">mut </span>row_groups = <span class="self">self
             </span>.row_groups
             .as_slice()
@@ -2169,7 +2182,6 @@
             .map(|v| v.to_thrift())
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="self">self</span>.write_bloom_filters(<span class="kw-2">&amp;mut </span>row_groups)<span class="question-mark">?</span>;
         <span class="comment">// Write column indexes and offset indexes
         </span><span class="self">self</span>.write_column_indexes(<span class="kw-2">&amp;mut </span>row_groups)<span class="question-mark">?</span>;
         <span class="self">self</span>.write_offset_indexes(<span class="kw-2">&amp;mut </span>row_groups)<span class="question-mark">?</span>;
@@ -2274,6 +2286,40 @@
     }
 }
 
+<span class="doccomment">/// Serialize all the bloom filters of the given row group to the given buffer,
+/// and returns the updated row group metadata.
+</span><span class="kw">fn </span>write_bloom_filters&lt;W: Write + Send&gt;(
+    buf: <span class="kw-2">&amp;mut </span>TrackedWrite&lt;W&gt;,
+    bloom_filters: <span class="kw-2">&amp;mut </span>[Vec&lt;<span class="prelude-ty">Option</span>&lt;Sbbf&gt;&gt;],
+    row_group: <span class="kw-2">&amp;mut </span>RowGroupMetaData,
+) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="comment">// iter row group
+    // iter each column
+    // write bloom filter to the file
+
+    </span><span class="kw">let </span>row_group_idx: u16 = row_group
+        .ordinal()
+        .expect(<span class="string">"Missing row group ordinal"</span>)
+        .try_into()
+        .expect(<span class="string">"Negative row group ordinal"</span>);
+    <span class="kw">let </span>row_group_idx = row_group_idx <span class="kw">as </span>usize;
+    <span class="kw">for </span>(column_idx, column_chunk) <span class="kw">in </span>row_group.columns_mut().iter_mut().enumerate() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(bloom_filter) = bloom_filters[row_group_idx][column_idx].take() {
+            <span class="kw">let </span>start_offset = buf.bytes_written();
+            bloom_filter.write(<span class="kw-2">&amp;mut *</span>buf)<span class="question-mark">?</span>;
+            <span class="kw">let </span>end_offset = buf.bytes_written();
+            <span class="comment">// set offset and index for bloom filter
+            </span><span class="kw-2">*</span>column_chunk = column_chunk
+                .clone()
+                .into_builder()
+                .set_bloom_filter_offset(<span class="prelude-val">Some</span>(start_offset <span class="kw">as </span>i64))
+                .set_bloom_filter_length(<span class="prelude-val">Some</span>((end_offset - start_offset) <span class="kw">as </span>i32))
+                .build()<span class="question-mark">?</span>;
+        }
+    }
+    <span class="prelude-val">Ok</span>(())
+}
+
 <span class="doccomment">/// Parquet row group writer API.
 /// Provides methods to access column writers in an iterator-like fashion, order is
 /// guaranteed to match the order of schema leaves (column descriptors).
@@ -2299,7 +2345,7 @@
     offset_indexes: Vec&lt;<span class="prelude-ty">Option</span>&lt;OffsetIndex&gt;&gt;,
     row_group_index: i16,
     file_offset: i64,
-    on_close: <span class="prelude-ty">Option</span>&lt;OnCloseRowGroup&lt;<span class="lifetime">'a</span>&gt;&gt;,
+    on_close: <span class="prelude-ty">Option</span>&lt;OnCloseRowGroup&lt;<span class="lifetime">'a</span>, W&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, W: Write + Send&gt; SerializedRowGroupWriter&lt;<span class="lifetime">'a</span>, W&gt; {
@@ -2316,7 +2362,7 @@
         properties: WriterPropertiesPtr,
         buf: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>TrackedWrite&lt;W&gt;,
         row_group_index: i16,
-        on_close: <span class="prelude-ty">Option</span>&lt;OnCloseRowGroup&lt;<span class="lifetime">'a</span>&gt;&gt;,
+        on_close: <span class="prelude-ty">Option</span>&lt;OnCloseRowGroup&lt;<span class="lifetime">'a</span>, W&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>num_columns = schema_descr.num_columns();
         <span class="kw">let </span>file_offset = buf.bytes_written() <span class="kw">as </span>i64;
@@ -2500,12 +2546,12 @@
                 .set_file_offset(<span class="self">self</span>.file_offset)
                 .build()<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>metadata = Arc::new(row_group_metadata);
-            <span class="self">self</span>.row_group_metadata = <span class="prelude-val">Some</span>(metadata.clone());
+            <span class="self">self</span>.row_group_metadata = <span class="prelude-val">Some</span>(Arc::new(row_group_metadata.clone()));
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(on_close) = <span class="self">self</span>.on_close.take() {
                 on_close(
-                    metadata,
+                    <span class="self">self</span>.buf,
+                    row_group_metadata,
                     <span class="self">self</span>.bloom_filters,
                     <span class="self">self</span>.column_indexes,
                     <span class="self">self</span>.offset_indexes,
@@ -3277,7 +3323,7 @@
             <span class="macro">assert_eq!</span>(flushed.len(), idx + <span class="number">1</span>);
             <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(idx <span class="kw">as </span>i16), last_group.ordinal());
             <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(row_group_file_offset <span class="kw">as </span>i64), last_group.file_offset());
-            <span class="macro">assert_eq!</span>(flushed[idx].as_ref(), last_group.as_ref());
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>flushed[idx], last_group.as_ref());
         }
         <span class="kw">let </span>file_metadata = file_writer.close().unwrap();
 
