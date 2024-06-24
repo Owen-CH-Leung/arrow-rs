@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (3cb521a43 2024-06-22)" data-channel="nightly" data-search-js="search-0fe7219eb170c82e.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (bcf94dec5 2024-06-23)" data-channel="nightly" data-search-js="search-0fe7219eb170c82e.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -9323,38 +9323,6 @@
 <a href="#9323" id="9323">9323</a>
 <a href="#9324" id="9324">9324</a>
 <a href="#9325" id="9325">9325</a>
-<a href="#9326" id="9326">9326</a>
-<a href="#9327" id="9327">9327</a>
-<a href="#9328" id="9328">9328</a>
-<a href="#9329" id="9329">9329</a>
-<a href="#9330" id="9330">9330</a>
-<a href="#9331" id="9331">9331</a>
-<a href="#9332" id="9332">9332</a>
-<a href="#9333" id="9333">9333</a>
-<a href="#9334" id="9334">9334</a>
-<a href="#9335" id="9335">9335</a>
-<a href="#9336" id="9336">9336</a>
-<a href="#9337" id="9337">9337</a>
-<a href="#9338" id="9338">9338</a>
-<a href="#9339" id="9339">9339</a>
-<a href="#9340" id="9340">9340</a>
-<a href="#9341" id="9341">9341</a>
-<a href="#9342" id="9342">9342</a>
-<a href="#9343" id="9343">9343</a>
-<a href="#9344" id="9344">9344</a>
-<a href="#9345" id="9345">9345</a>
-<a href="#9346" id="9346">9346</a>
-<a href="#9347" id="9347">9347</a>
-<a href="#9348" id="9348">9348</a>
-<a href="#9349" id="9349">9349</a>
-<a href="#9350" id="9350">9350</a>
-<a href="#9351" id="9351">9351</a>
-<a href="#9352" id="9352">9352</a>
-<a href="#9353" id="9353">9353</a>
-<a href="#9354" id="9354">9354</a>
-<a href="#9355" id="9355">9355</a>
-<a href="#9356" id="9356">9356</a>
-<a href="#9357" id="9357">9357</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -10587,7 +10555,7 @@
                 <span class="kw">let </span>binary = BinaryArray::from(array.as_string::&lt;i32&gt;().clone());
                 cast_byte_container::&lt;BinaryType, LargeBinaryType&gt;(<span class="kw-2">&amp;</span>binary)
             }
-            Utf8View =&gt; cast_byte_to_view::&lt;Utf8Type, StringViewType&gt;(array),
+            Utf8View =&gt; <span class="prelude-val">Ok</span>(Arc::new(StringViewArray::from(array.as_string::&lt;i32&gt;()))),
             LargeUtf8 =&gt; cast_byte_container::&lt;Utf8Type, LargeUtf8Type&gt;(array),
             Time32(TimeUnit::Second) =&gt; parse_string::&lt;Time32SecondType, i32&gt;(array, cast_options),
             Time32(TimeUnit::Millisecond) =&gt; {
@@ -10647,7 +10615,7 @@
             LargeBinary =&gt; <span class="prelude-val">Ok</span>(Arc::new(LargeBinaryArray::from(
                 array.as_string::&lt;i64&gt;().clone(),
             ))),
-            Utf8View =&gt; cast_byte_to_view::&lt;LargeUtf8Type, StringViewType&gt;(array),
+            Utf8View =&gt; <span class="prelude-val">Ok</span>(Arc::new(StringViewArray::from(array.as_string::&lt;i64&gt;()))),
             Time32(TimeUnit::Second) =&gt; parse_string::&lt;Time32SecondType, i64&gt;(array, cast_options),
             Time32(TimeUnit::Millisecond) =&gt; {
                 parse_string::&lt;Time32MillisecondType, i64&gt;(array, cast_options)
@@ -10695,7 +10663,7 @@
             FixedSizeBinary(size) =&gt; {
                 cast_binary_to_fixed_size_binary::&lt;i32&gt;(array, <span class="kw-2">*</span>size, cast_options)
             }
-            BinaryView =&gt; cast_byte_to_view::&lt;BinaryType, BinaryViewType&gt;(array),
+            BinaryView =&gt; <span class="prelude-val">Ok</span>(Arc::new(BinaryViewArray::from(array.as_binary::&lt;i32&gt;()))),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(<span class="macro">format!</span>(
                 <span class="string">"Casting from {from_type:?} to {to_type:?} not supported"</span>,
             ))),
@@ -10710,7 +10678,7 @@
             FixedSizeBinary(size) =&gt; {
                 cast_binary_to_fixed_size_binary::&lt;i64&gt;(array, <span class="kw-2">*</span>size, cast_options)
             }
-            BinaryView =&gt; cast_byte_to_view::&lt;LargeBinaryType, BinaryViewType&gt;(array),
+            BinaryView =&gt; <span class="prelude-val">Ok</span>(Arc::new(BinaryViewArray::from(array.as_binary::&lt;i64&gt;()))),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(<span class="macro">format!</span>(
                 <span class="string">"Casting from {from_type:?} to {to_type:?} not supported"</span>,
             ))),
@@ -11700,38 +11668,6 @@
     <span class="kw">let </span>array_data = <span class="kw">unsafe </span>{ builder.build_unchecked() };
 
     <span class="prelude-val">Ok</span>(Arc::new(GenericByteArray::&lt;TO&gt;::from(array_data)))
-}
-
-<span class="doccomment">/// Helper function to cast from one `ByteArrayType` array to `ByteViewType` array.
-</span><span class="kw">fn </span>cast_byte_to_view&lt;FROM, V&gt;(array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt;
-<span class="kw">where
-    </span>FROM: ByteArrayType,
-    FROM::Offset: OffsetSizeTrait + ToPrimitive,
-    V: ByteViewType,
-{
-    <span class="kw">let </span>byte_array: <span class="kw-2">&amp;</span>GenericByteArray&lt;FROM&gt; = array.as_bytes();
-    <span class="kw">let </span>len = array.len();
-    <span class="kw">let </span>str_values_buf = byte_array.values().clone();
-    <span class="kw">let </span>offsets = byte_array.offsets();
-
-    <span class="kw">let </span><span class="kw-2">mut </span>views_builder = GenericByteViewBuilder::&lt;V&gt;::with_capacity(len);
-    <span class="kw">let </span>block = views_builder.append_block(str_values_buf);
-    <span class="kw">for </span>(i, w) <span class="kw">in </span>offsets.windows(<span class="number">2</span>).enumerate() {
-        <span class="kw">let </span>offset = w[<span class="number">0</span>].to_u32().unwrap();
-        <span class="kw">let </span>end = w[<span class="number">1</span>].to_u32().unwrap();
-        <span class="kw">let </span>length = end - offset;
-
-        <span class="kw">if </span>byte_array.is_null(i) {
-            views_builder.append_null();
-        } <span class="kw">else </span>{
-            <span class="comment">// Safety: the input was a valid array so it valid UTF8 (if string). And
-            // all offsets were valid and we created the views correctly
-            </span><span class="kw">unsafe </span>{ views_builder.append_view_unchecked(block, offset, length) }
-        }
-    }
-
-    <span class="macro">assert_eq!</span>(views_builder.len(), len);
-    <span class="prelude-val">Ok</span>(Arc::new(views_builder.finish()))
 }
 
 <span class="doccomment">/// Helper function to cast from one `ByteViewType` array to `ByteArrayType` array.
