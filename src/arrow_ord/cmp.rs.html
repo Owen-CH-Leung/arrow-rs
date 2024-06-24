@@ -832,6 +832,22 @@
 <a href="#832" id="832">832</a>
 <a href="#833" id="833">833</a>
 <a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -904,9 +920,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>eq(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::Equal, lhs, rhs)
 }
@@ -919,9 +937,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>neq(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::NotEqual, lhs, rhs)
 }
@@ -934,9 +954,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>lt(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::Less, lhs, rhs)
 }
@@ -949,9 +971,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>lt_eq(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::LessEqual, lhs, rhs)
 }
@@ -964,9 +988,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>gt(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::Greater, lhs, rhs)
 }
@@ -979,9 +1005,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>gt_eq(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::GreaterEqual, lhs, rhs)
 }
@@ -995,9 +1023,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>distinct(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::Distinct, lhs, rhs)
 }
@@ -1011,9 +1041,11 @@
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros as different. If it is necessary
-/// to treat them as equal, please normalize zeros before calling this kernel.
+/// to treat them as equal, please normalize zeros before calling this kernel. See
+/// [`f32::total_cmp`] and [`f64::total_cmp`].
 ///
-/// Please refer to [`f32::total_cmp`] and [`f64::total_cmp`]
+/// Nested types, such as lists, are not supported as the null semantics are not well-defined.
+/// For comparisons involving nested types see [`crate::ord::make_comparator`]
 </span><span class="kw">pub fn </span>not_distinct(lhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum, rhs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Datum) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     compare_op(Op::NotDistinct, lhs, rhs)
 }
