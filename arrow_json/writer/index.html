@@ -43,7 +43,7 @@ writer.finish().unwrap();
 <p><a href="type.LineDelimitedWriter.html" title="type arrow_json::writer::LineDelimitedWriter"><code>LineDelimitedWriter</code></a> and <a href="type.ArrayWriter.html" title="type arrow_json::writer::ArrayWriter"><code>ArrayWriter</code></a> will omit writing keys with null values.
 In order to explicitly write null values for keys, configure a custom <a href="struct.Writer.html" title="struct arrow_json::writer::Writer"><code>Writer</code></a> by
 using a <a href="struct.WriterBuilder.html" title="struct arrow_json::writer::WriterBuilder"><code>WriterBuilder</code></a> to construct a <a href="struct.Writer.html" title="struct arrow_json::writer::Writer"><code>Writer</code></a>.</p>
-<h3 id="writing-to-serde_json-json-objects"><a class="doc-anchor" href="#writing-to-serde_json-json-objects">§</a>Writing to <a href="https://docs.rs/serde_json/1.0.117/serde_json/index.html" title="mod serde_json">serde_json</a> JSON Objects</h3>
+<h3 id="writing-to-serde_json-json-objects"><a class="doc-anchor" href="#writing-to-serde_json-json-objects">§</a>Writing to <a href="https://docs.rs/serde_json/1.0.118/serde_json/index.html" title="mod serde_json">serde_json</a> JSON Objects</h3>
 <p>To serialize [<code>RecordBatch</code>]es into an array of
 <a href="https://docs.serde.rs/serde_json/">JSON</a> objects you can reparse the resulting JSON string.
 Note that this is less efficient than using the <code>Writer</code> API.</p>
