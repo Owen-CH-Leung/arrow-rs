@@ -1979,32 +1979,32 @@ To export an array, create an `ArrowArray` using [ArrowArray::try_new].
                 (length + <span class="number">1</span>) * (bits / <span class="number">8</span>)
             }
             (DataType::Utf8, <span class="number">2</span>) | (DataType::Binary, <span class="number">2</span>) =&gt; {
-                <span class="comment">// the len of the data buffer (buffer 2) equals the difference between the last value
-                // and the first value of the offset buffer (buffer 1).
+                <span class="kw">if </span><span class="self">self</span>.array.is_empty() {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
+                }
+
+                <span class="comment">// the len of the data buffer (buffer 2) equals the last value of the offset buffer (buffer 1)
                 </span><span class="kw">let </span>len = <span class="self">self</span>.buffer_len(<span class="number">1</span>, dt)<span class="question-mark">?</span>;
                 <span class="comment">// first buffer is the null buffer =&gt; add(1)
                 // we assume that pointer is aligned for `i32`, as Utf8 uses `i32` offsets.
                 </span><span class="attr">#[allow(clippy::cast_ptr_alignment)]
                 </span><span class="kw">let </span>offset_buffer = <span class="self">self</span>.array.buffer(<span class="number">1</span>) <span class="kw">as </span><span class="kw-2">*const </span>i32;
-                <span class="comment">// get first offset
-                </span><span class="kw">let </span>start = (<span class="kw">unsafe </span>{ <span class="kw-2">*</span>offset_buffer.add(<span class="number">0</span>) }) <span class="kw">as </span>usize;
                 <span class="comment">// get last offset
-                </span><span class="kw">let </span>end = (<span class="kw">unsafe </span>{ <span class="kw-2">*</span>offset_buffer.add(len / size_of::&lt;i32&gt;() - <span class="number">1</span>) }) <span class="kw">as </span>usize;
-                end - start
+                </span>(<span class="kw">unsafe </span>{ <span class="kw-2">*</span>offset_buffer.add(len / size_of::&lt;i32&gt;() - <span class="number">1</span>) }) <span class="kw">as </span>usize
             }
             (DataType::LargeUtf8, <span class="number">2</span>) | (DataType::LargeBinary, <span class="number">2</span>) =&gt; {
-                <span class="comment">// the len of the data buffer (buffer 2) equals the difference between the last value
-                // and the first value of the offset buffer (buffer 1).
+                <span class="kw">if </span><span class="self">self</span>.array.is_empty() {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
+                }
+
+                <span class="comment">// the len of the data buffer (buffer 2) equals the last value of the offset buffer (buffer 1)
                 </span><span class="kw">let </span>len = <span class="self">self</span>.buffer_len(<span class="number">1</span>, dt)<span class="question-mark">?</span>;
                 <span class="comment">// first buffer is the null buffer =&gt; add(1)
                 // we assume that pointer is aligned for `i64`, as Large uses `i64` offsets.
                 </span><span class="attr">#[allow(clippy::cast_ptr_alignment)]
                 </span><span class="kw">let </span>offset_buffer = <span class="self">self</span>.array.buffer(<span class="number">1</span>) <span class="kw">as </span><span class="kw-2">*const </span>i64;
-                <span class="comment">// get first offset
-                </span><span class="kw">let </span>start = (<span class="kw">unsafe </span>{ <span class="kw-2">*</span>offset_buffer.add(<span class="number">0</span>) }) <span class="kw">as </span>usize;
                 <span class="comment">// get last offset
-                </span><span class="kw">let </span>end = (<span class="kw">unsafe </span>{ <span class="kw-2">*</span>offset_buffer.add(len / size_of::&lt;i64&gt;() - <span class="number">1</span>) }) <span class="kw">as </span>usize;
-                end - start
+                </span>(<span class="kw">unsafe </span>{ <span class="kw-2">*</span>offset_buffer.add(len / size_of::&lt;i64&gt;() - <span class="number">1</span>) }) <span class="kw">as </span>usize
             }
             <span class="comment">// buffer len of primitive types
             </span><span class="kw">_ </span>=&gt; {
