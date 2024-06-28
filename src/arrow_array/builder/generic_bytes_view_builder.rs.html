@@ -429,6 +429,13 @@
 <a href="#429" id="429">429</a>
 <a href="#430" id="430">430</a>
 <a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -559,21 +566,8 @@
         <span class="kw">let </span>end = start.saturating_add(len <span class="kw">as </span>usize);
         <span class="kw">let </span>b = b.get_unchecked(start..end);
 
-        <span class="kw">if </span>len &lt;= <span class="number">12 </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>view_buffer = [<span class="number">0</span>; <span class="number">16</span>];
-            view_buffer[<span class="number">0</span>..<span class="number">4</span>].copy_from_slice(<span class="kw-2">&amp;</span>len.to_le_bytes());
-            view_buffer[<span class="number">4</span>..<span class="number">4 </span>+ b.len()].copy_from_slice(b);
-            <span class="self">self</span>.views_builder.append(u128::from_le_bytes(view_buffer));
-        } <span class="kw">else </span>{
-            <span class="kw">let </span>view = ByteView {
-                length: len,
-                prefix: u32::from_le_bytes(b[<span class="number">0</span>..<span class="number">4</span>].try_into().unwrap()),
-                buffer_index: block,
-                offset,
-            };
-            <span class="self">self</span>.views_builder.append(view.into());
-        }
-
+        <span class="kw">let </span>view = make_view(b, block, offset);
+        <span class="self">self</span>.views_builder.append(view);
         <span class="self">self</span>.null_buffer_builder.append_non_null();
     }
 
@@ -775,6 +769,26 @@
 /// Values can be appended using [`GenericByteViewBuilder::append_value`], and nulls with
 /// [`GenericByteViewBuilder::append_null`] as normal.
 </span><span class="kw">pub type </span>BinaryViewBuilder = GenericByteViewBuilder&lt;BinaryViewType&gt;;
+
+<span class="doccomment">/// Create a view based on the given data, block id and offset
+</span><span class="attr">#[inline(always)]
+</span><span class="kw">pub fn </span>make_view(data: <span class="kw-2">&amp;</span>[u8], block_id: u32, offset: u32) -&gt; u128 {
+    <span class="kw">let </span>len = data.len() <span class="kw">as </span>u32;
+    <span class="kw">if </span>len &lt;= <span class="number">12 </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>view_buffer = [<span class="number">0</span>; <span class="number">16</span>];
+        view_buffer[<span class="number">0</span>..<span class="number">4</span>].copy_from_slice(<span class="kw-2">&amp;</span>len.to_le_bytes());
+        view_buffer[<span class="number">4</span>..<span class="number">4 </span>+ data.len()].copy_from_slice(data);
+        u128::from_le_bytes(view_buffer)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>view = ByteView {
+            length: len,
+            prefix: u32::from_le_bytes(data[<span class="number">0</span>..<span class="number">4</span>].try_into().unwrap()),
+            buffer_index: block_id,
+            offset,
+        };
+        view.into()
+    }
+}
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
