@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-ipc/src/writer.rs`."><title>writer.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_ipc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (9c3bc805d 2024-06-27)" data-channel="nightly" data-search-js="search-0fe7219eb170c82e.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-ipc/src/writer.rs`."><title>writer.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_ipc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (e9e6e2e44 2024-06-28)" data-channel="nightly" data-search-js="search-0fe7219eb170c82e.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2512,6 +2512,110 @@
 <a href="#2512" id="2512">2512</a>
 <a href="#2513" id="2513">2513</a>
 <a href="#2514" id="2514">2514</a>
+<a href="#2515" id="2515">2515</a>
+<a href="#2516" id="2516">2516</a>
+<a href="#2517" id="2517">2517</a>
+<a href="#2518" id="2518">2518</a>
+<a href="#2519" id="2519">2519</a>
+<a href="#2520" id="2520">2520</a>
+<a href="#2521" id="2521">2521</a>
+<a href="#2522" id="2522">2522</a>
+<a href="#2523" id="2523">2523</a>
+<a href="#2524" id="2524">2524</a>
+<a href="#2525" id="2525">2525</a>
+<a href="#2526" id="2526">2526</a>
+<a href="#2527" id="2527">2527</a>
+<a href="#2528" id="2528">2528</a>
+<a href="#2529" id="2529">2529</a>
+<a href="#2530" id="2530">2530</a>
+<a href="#2531" id="2531">2531</a>
+<a href="#2532" id="2532">2532</a>
+<a href="#2533" id="2533">2533</a>
+<a href="#2534" id="2534">2534</a>
+<a href="#2535" id="2535">2535</a>
+<a href="#2536" id="2536">2536</a>
+<a href="#2537" id="2537">2537</a>
+<a href="#2538" id="2538">2538</a>
+<a href="#2539" id="2539">2539</a>
+<a href="#2540" id="2540">2540</a>
+<a href="#2541" id="2541">2541</a>
+<a href="#2542" id="2542">2542</a>
+<a href="#2543" id="2543">2543</a>
+<a href="#2544" id="2544">2544</a>
+<a href="#2545" id="2545">2545</a>
+<a href="#2546" id="2546">2546</a>
+<a href="#2547" id="2547">2547</a>
+<a href="#2548" id="2548">2548</a>
+<a href="#2549" id="2549">2549</a>
+<a href="#2550" id="2550">2550</a>
+<a href="#2551" id="2551">2551</a>
+<a href="#2552" id="2552">2552</a>
+<a href="#2553" id="2553">2553</a>
+<a href="#2554" id="2554">2554</a>
+<a href="#2555" id="2555">2555</a>
+<a href="#2556" id="2556">2556</a>
+<a href="#2557" id="2557">2557</a>
+<a href="#2558" id="2558">2558</a>
+<a href="#2559" id="2559">2559</a>
+<a href="#2560" id="2560">2560</a>
+<a href="#2561" id="2561">2561</a>
+<a href="#2562" id="2562">2562</a>
+<a href="#2563" id="2563">2563</a>
+<a href="#2564" id="2564">2564</a>
+<a href="#2565" id="2565">2565</a>
+<a href="#2566" id="2566">2566</a>
+<a href="#2567" id="2567">2567</a>
+<a href="#2568" id="2568">2568</a>
+<a href="#2569" id="2569">2569</a>
+<a href="#2570" id="2570">2570</a>
+<a href="#2571" id="2571">2571</a>
+<a href="#2572" id="2572">2572</a>
+<a href="#2573" id="2573">2573</a>
+<a href="#2574" id="2574">2574</a>
+<a href="#2575" id="2575">2575</a>
+<a href="#2576" id="2576">2576</a>
+<a href="#2577" id="2577">2577</a>
+<a href="#2578" id="2578">2578</a>
+<a href="#2579" id="2579">2579</a>
+<a href="#2580" id="2580">2580</a>
+<a href="#2581" id="2581">2581</a>
+<a href="#2582" id="2582">2582</a>
+<a href="#2583" id="2583">2583</a>
+<a href="#2584" id="2584">2584</a>
+<a href="#2585" id="2585">2585</a>
+<a href="#2586" id="2586">2586</a>
+<a href="#2587" id="2587">2587</a>
+<a href="#2588" id="2588">2588</a>
+<a href="#2589" id="2589">2589</a>
+<a href="#2590" id="2590">2590</a>
+<a href="#2591" id="2591">2591</a>
+<a href="#2592" id="2592">2592</a>
+<a href="#2593" id="2593">2593</a>
+<a href="#2594" id="2594">2594</a>
+<a href="#2595" id="2595">2595</a>
+<a href="#2596" id="2596">2596</a>
+<a href="#2597" id="2597">2597</a>
+<a href="#2598" id="2598">2598</a>
+<a href="#2599" id="2599">2599</a>
+<a href="#2600" id="2600">2600</a>
+<a href="#2601" id="2601">2601</a>
+<a href="#2602" id="2602">2602</a>
+<a href="#2603" id="2603">2603</a>
+<a href="#2604" id="2604">2604</a>
+<a href="#2605" id="2605">2605</a>
+<a href="#2606" id="2606">2606</a>
+<a href="#2607" id="2607">2607</a>
+<a href="#2608" id="2608">2608</a>
+<a href="#2609" id="2609">2609</a>
+<a href="#2610" id="2610">2610</a>
+<a href="#2611" id="2611">2611</a>
+<a href="#2612" id="2612">2612</a>
+<a href="#2613" id="2613">2613</a>
+<a href="#2614" id="2614">2614</a>
+<a href="#2615" id="2615">2615</a>
+<a href="#2616" id="2616">2616</a>
+<a href="#2617" id="2617">2617</a>
+<a href="#2618" id="2618">2618</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2573,6 +2677,11 @@
     <span class="doccomment">/// Compression, if desired. Will result in a runtime error
     /// if the corresponding feature is not enabled
     </span>batch_compression_type: <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::CompressionType&gt;,
+    <span class="doccomment">/// Flag indicating whether the writer should preserver the dictionary IDs defined in the
+    /// schema or generate unique dictionary IDs internally during encoding.
+    ///
+    /// Defaults to `true`
+    </span>preserve_dict_id: bool,
 }
 
 <span class="kw">impl </span>IpcWriteOptions {
@@ -2595,7 +2704,7 @@
         }
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
-    <span class="doccomment">/// Try create IpcWriteOptions, checking for incompatible settings
+    <span class="doccomment">/// Try to create IpcWriteOptions, checking for incompatible settings
     </span><span class="kw">pub fn </span>try_new(
         alignment: usize,
         write_legacy_ipc_format: bool,
@@ -2620,6 +2729,7 @@
                 write_legacy_ipc_format,
                 metadata_version,
                 batch_compression_type: <span class="prelude-val">None</span>,
+                preserve_dict_id: <span class="bool-val">true</span>,
             }),
             <span class="kw">crate</span>::MetadataVersion::V5 =&gt; {
                 <span class="kw">if </span>write_legacy_ipc_format {
@@ -2632,6 +2742,7 @@
                         write_legacy_ipc_format,
                         metadata_version,
                         batch_compression_type: <span class="prelude-val">None</span>,
+                        preserve_dict_id: <span class="bool-val">true</span>,
                     })
                 }
             }
@@ -2640,6 +2751,22 @@
             </span>))),
         }
     }
+
+    <span class="kw">pub fn </span>preserve_dict_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.preserve_dict_id
+    }
+
+    <span class="doccomment">/// Set whether the IPC writer should preserve the dictionary IDs in the schema
+    /// or auto-assign unique dictionary IDs during encoding (defaults to true)
+    ///
+    /// If this option is true,  the application must handle assigning ids
+    /// to the dictionary batches in order to encode them correctly
+    ///
+    /// The default will change to `false`  in future releases
+    </span><span class="kw">pub fn </span>with_preserve_dict_id(<span class="kw-2">mut </span><span class="self">self</span>, preserve_dict_id: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.preserve_dict_id = preserve_dict_id;
+        <span class="self">self
+    </span>}
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>IpcWriteOptions {
@@ -2649,6 +2776,7 @@
             write_legacy_ipc_format: <span class="bool-val">false</span>,
             metadata_version: <span class="kw">crate</span>::MetadataVersion::V5,
             batch_compression_type: <span class="prelude-val">None</span>,
+            preserve_dict_id: <span class="bool-val">true</span>,
         }
     }
 }
@@ -2677,7 +2805,7 @@
 ///
 /// // encode the batch into zero or more encoded dictionaries
 /// // and the data for the actual array.
-/// let data_gen = IpcDataGenerator {};
+/// let data_gen = IpcDataGenerator::default();
 /// let (encoded_dictionaries, encoded_message) = data_gen
 ///   .encoded_batch(&amp;batch, &amp;mut dictionary_tracker, &amp;options)
 ///   .unwrap();
@@ -2712,12 +2840,13 @@
         }
     }
 
-    <span class="kw">fn </span>_encode_dictionaries(
+    <span class="kw">fn </span>_encode_dictionaries&lt;I: Iterator&lt;Item = i64&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         column: <span class="kw-2">&amp;</span>ArrayRef,
         encoded_dictionaries: <span class="kw-2">&amp;mut </span>Vec&lt;EncodedData&gt;,
         dictionary_tracker: <span class="kw-2">&amp;mut </span>DictionaryTracker,
         write_options: <span class="kw-2">&amp;</span>IpcWriteOptions,
+        dict_id: <span class="kw-2">&amp;mut </span>I,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
         <span class="kw">match </span>column.data_type() {
             DataType::Struct(fields) =&gt; {
@@ -2729,6 +2858,7 @@
                         encoded_dictionaries,
                         dictionary_tracker,
                         write_options,
+                        dict_id,
                     )<span class="question-mark">?</span>;
                 }
             }
@@ -2749,6 +2879,7 @@
                     encoded_dictionaries,
                     dictionary_tracker,
                     write_options,
+                    dict_id,
                 )<span class="question-mark">?</span>;
             }
             DataType::List(field) =&gt; {
@@ -2759,6 +2890,7 @@
                     encoded_dictionaries,
                     dictionary_tracker,
                     write_options,
+                    dict_id,
                 )<span class="question-mark">?</span>;
             }
             DataType::LargeList(field) =&gt; {
@@ -2769,6 +2901,7 @@
                     encoded_dictionaries,
                     dictionary_tracker,
                     write_options,
+                    dict_id,
                 )<span class="question-mark">?</span>;
             }
             DataType::FixedSizeList(field, <span class="kw">_</span>) =&gt; {
@@ -2782,6 +2915,7 @@
                     encoded_dictionaries,
                     dictionary_tracker,
                     write_options,
+                    dict_id,
                 )<span class="question-mark">?</span>;
             }
             DataType::Map(field, <span class="kw">_</span>) =&gt; {
@@ -2799,6 +2933,7 @@
                     encoded_dictionaries,
                     dictionary_tracker,
                     write_options,
+                    dict_id,
                 )<span class="question-mark">?</span>;
 
                 <span class="comment">// values
@@ -2808,6 +2943,7 @@
                     encoded_dictionaries,
                     dictionary_tracker,
                     write_options,
+                    dict_id,
                 )<span class="question-mark">?</span>;
             }
             DataType::Union(fields, <span class="kw">_</span>) =&gt; {
@@ -2820,6 +2956,7 @@
                         encoded_dictionaries,
                         dictionary_tracker,
                         write_options,
+                        dict_id,
                     )<span class="question-mark">?</span>;
                 }
             }
@@ -2829,19 +2966,24 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>encode_dictionaries(
+    <span class="kw">fn </span>encode_dictionaries&lt;I: Iterator&lt;Item = i64&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         field: <span class="kw-2">&amp;</span>Field,
         column: <span class="kw-2">&amp;</span>ArrayRef,
         encoded_dictionaries: <span class="kw-2">&amp;mut </span>Vec&lt;EncodedData&gt;,
         dictionary_tracker: <span class="kw-2">&amp;mut </span>DictionaryTracker,
         write_options: <span class="kw-2">&amp;</span>IpcWriteOptions,
+        dict_id_seq: <span class="kw-2">&amp;mut </span>I,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
         <span class="kw">match </span>column.data_type() {
             DataType::Dictionary(_key_type, _value_type) =&gt; {
-                <span class="kw">let </span>dict_id = field
-                    .dict_id()
-                    .expect(<span class="string">"All Dictionary types have `dict_id`"</span>);
+                <span class="kw">let </span>dict_id = dict_id_seq
+                    .next()
+                    .or_else(|| field.dict_id())
+                    .ok_or_else(|| {
+                        ArrowError::IpcError(<span class="macro">format!</span>(<span class="string">"no dict id for field {}"</span>, field.name()))
+                    })<span class="question-mark">?</span>;
+
                 <span class="kw">let </span>dict_data = column.to_data();
                 <span class="kw">let </span>dict_values = <span class="kw-2">&amp;</span>dict_data.child_data()[<span class="number">0</span>];
 
@@ -2852,6 +2994,7 @@
                     encoded_dictionaries,
                     dictionary_tracker,
                     write_options,
+                    dict_id_seq,
                 )<span class="question-mark">?</span>;
 
                 <span class="kw">let </span>emit = dictionary_tracker.insert(dict_id, column)<span class="question-mark">?</span>;
@@ -2869,6 +3012,7 @@
                 encoded_dictionaries,
                 dictionary_tracker,
                 write_options,
+                dict_id_seq,
             )<span class="question-mark">?</span>,
         }
 
@@ -2887,6 +3031,8 @@
         <span class="kw">let </span>schema = batch.schema();
         <span class="kw">let </span><span class="kw-2">mut </span>encoded_dictionaries = Vec::with_capacity(schema.all_fields().len());
 
+        <span class="kw">let </span><span class="kw-2">mut </span>dict_id = dictionary_tracker.dict_ids.clone().into_iter();
+
         <span class="kw">for </span>(i, field) <span class="kw">in </span>schema.fields().iter().enumerate() {
             <span class="kw">let </span>column = batch.column(i);
             <span class="self">self</span>.encode_dictionaries(
@@ -2895,6 +3041,7 @@
                 <span class="kw-2">&amp;mut </span>encoded_dictionaries,
                 dictionary_tracker,
                 write_options,
+                <span class="kw-2">&amp;mut </span>dict_id,
             )<span class="question-mark">?</span>;
         }
 
@@ -3185,18 +3332,71 @@
 /// isn't allowed in the `FileWriter`.
 </span><span class="kw">pub struct </span>DictionaryTracker {
     written: HashMap&lt;i64, ArrayData&gt;,
+    dict_ids: Vec&lt;i64&gt;,
     error_on_replacement: bool,
+    preserve_dict_id: bool,
 }
 
 <span class="kw">impl </span>DictionaryTracker {
-    <span class="doccomment">/// Create a new [`DictionaryTracker`]. If `error_on_replacement`
+    <span class="doccomment">/// Create a new [`DictionaryTracker`].
+    ///
+    /// If `error_on_replacement`
     /// is true, an error will be generated if an update to an
     /// existing dictionary is attempted.
+    ///
+    /// If `preserve_dict_id` is true, the dictionary ID defined in the schema
+    /// is used, otherwise a unique dictionary ID will be assigned by incrementing
+    /// the last seen dictionary ID (or using `0` if no other dictionary IDs have been
+    /// seen)
     </span><span class="kw">pub fn </span>new(error_on_replacement: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             written: HashMap::new(),
+            dict_ids: Vec::new(),
             error_on_replacement,
+            preserve_dict_id: <span class="bool-val">true</span>,
         }
+    }
+
+    <span class="doccomment">/// Create a new [`DictionaryTracker`].
+    ///
+    /// If `error_on_replacement`
+    /// is true, an error will be generated if an update to an
+    /// existing dictionary is attempted.
+    </span><span class="kw">pub fn </span>new_with_preserve_dict_id(error_on_replacement: bool, preserve_dict_id: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            written: HashMap::new(),
+            dict_ids: Vec::new(),
+            error_on_replacement,
+            preserve_dict_id,
+        }
+    }
+
+    <span class="doccomment">/// Set the dictionary ID for `field`.
+    ///
+    /// If `preserve_dict_id` is true, this will return the `dict_id` in `field` (or panic if `field` does
+    /// not have a `dict_id` defined).
+    ///
+    /// If `preserve_dict_id` is false, this will return the value of the last `dict_id` assigned incremented by 1
+    /// or 0 in the case where no dictionary IDs have yet been assigned
+    </span><span class="kw">pub fn </span>set_dict_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field) -&gt; i64 {
+        <span class="kw">let </span>next = <span class="kw">if </span><span class="self">self</span>.preserve_dict_id {
+            field.dict_id().expect(<span class="string">"no dict_id in field"</span>)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.dict_ids
+                .last()
+                .copied()
+                .map(|i| i + <span class="number">1</span>)
+                .unwrap_or_default()
+        };
+
+        <span class="self">self</span>.dict_ids.push(next);
+        next
+    }
+
+    <span class="doccomment">/// Return the sequence of dictionary IDs in the order they should be observed while
+    /// traversing the schema
+    </span><span class="kw">pub fn </span>dict_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[i64] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.dict_ids
     }
 
     <span class="doccomment">/// Keep track of the dictionary with the given ID and values. Behavior:
@@ -3285,6 +3485,7 @@
         <span class="comment">// write the schema, set the written bytes to the schema + header
         </span><span class="kw">let </span>encoded_message = data_gen.schema_to_bytes(schema, <span class="kw-2">&amp;</span>write_options);
         <span class="kw">let </span>(meta, data) = write_message(<span class="kw-2">&amp;mut </span>writer, encoded_message, <span class="kw-2">&amp;</span>write_options)<span class="question-mark">?</span>;
+        <span class="kw">let </span>preserve_dict_id = write_options.preserve_dict_id;
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             writer,
             write_options,
@@ -3293,7 +3494,10 @@
             dictionary_blocks: <span class="macro">vec!</span>[],
             record_blocks: <span class="macro">vec!</span>[],
             finished: <span class="bool-val">false</span>,
-            dictionary_tracker: DictionaryTracker::new(<span class="bool-val">true</span>),
+            dictionary_tracker: DictionaryTracker::new_with_preserve_dict_id(
+                <span class="bool-val">true</span>,
+                preserve_dict_id,
+            ),
             custom_metadata: HashMap::new(),
             data_gen,
         })
@@ -3450,11 +3654,15 @@
         <span class="comment">// write the schema, set the written bytes to the schema
         </span><span class="kw">let </span>encoded_message = data_gen.schema_to_bytes(schema, <span class="kw-2">&amp;</span>write_options);
         write_message(<span class="kw-2">&amp;mut </span>writer, encoded_message, <span class="kw-2">&amp;</span>write_options)<span class="question-mark">?</span>;
+        <span class="kw">let </span>preserve_dict_id = write_options.preserve_dict_id;
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             writer,
             write_options,
             finished: <span class="bool-val">false</span>,
-            dictionary_tracker: DictionaryTracker::new(<span class="bool-val">false</span>),
+            dictionary_tracker: DictionaryTracker::new_with_preserve_dict_id(
+                <span class="bool-val">false</span>,
+                preserve_dict_id,
+            ),
             data_gen,
         })
     }
@@ -4331,11 +4539,12 @@
         <span class="kw">let </span>batch = RecordBatch::try_new(schema, <span class="macro">vec!</span>[Arc::new(union)]).unwrap();
 
         <span class="kw">let </span>gen = IpcDataGenerator {};
-        <span class="kw">let </span><span class="kw-2">mut </span>dict_tracker = DictionaryTracker::new(<span class="bool-val">false</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dict_tracker = DictionaryTracker::new_with_preserve_dict_id(<span class="bool-val">false</span>, <span class="bool-val">true</span>);
         gen.encoded_batch(<span class="kw-2">&amp;</span>batch, <span class="kw-2">&amp;mut </span>dict_tracker, <span class="kw-2">&amp;</span>Default::default())
             .unwrap();
 
-        <span class="comment">// Dictionary with id 2 should have been written to the dict tracker
+        <span class="comment">// The encoder will assign dict IDs itself to ensure uniqueness and ignore the dict ID in the schema
+        // so we expect the dict will be keyed to 0
         </span><span class="macro">assert!</span>(dict_tracker.written.contains_key(<span class="kw-2">&amp;</span><span class="number">2</span>));
     }
 
@@ -4366,12 +4575,11 @@
         <span class="kw">let </span>batch = RecordBatch::try_new(schema, <span class="macro">vec!</span>[struct_array]).unwrap();
 
         <span class="kw">let </span>gen = IpcDataGenerator {};
-        <span class="kw">let </span><span class="kw-2">mut </span>dict_tracker = DictionaryTracker::new(<span class="bool-val">false</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dict_tracker = DictionaryTracker::new_with_preserve_dict_id(<span class="bool-val">false</span>, <span class="bool-val">true</span>);
         gen.encoded_batch(<span class="kw-2">&amp;</span>batch, <span class="kw-2">&amp;mut </span>dict_tracker, <span class="kw-2">&amp;</span>Default::default())
             .unwrap();
 
-        <span class="comment">// Dictionary with id 2 should have been written to the dict tracker
-        </span><span class="macro">assert!</span>(dict_tracker.written.contains_key(<span class="kw-2">&amp;</span><span class="number">2</span>));
+        <span class="macro">assert!</span>(dict_tracker.written.contains_key(<span class="kw-2">&amp;</span><span class="number">2</span>));
     }
 
     <span class="kw">fn </span>write_union_file(options: IpcWriteOptions) {
