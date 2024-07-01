@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["ACompleteRecord","APartiallyCompleteRecord"]};
+window.SIDEBAR_ITEMS = {"struct":["ACompleteRecord","APartiallyCompleteRecord","APartiallyOptionalRecord"]};
